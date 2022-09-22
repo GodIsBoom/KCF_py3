@@ -58,14 +58,18 @@ if __name__ == '__main__':
     # else:
         # assert(0), "too many arguments"
     cap = cv2.VideoCapture(0)
+    vc=cv2.VideoCapture('card.mp4')
     tracker = kcftracker.KCFTracker(True, True, True)  # hog, fixed_window, multiscale
     # if you use hog feature, there will be a short pause after you draw a first boundingbox, that is due to the use of Numba.
 
     cv2.namedWindow('tracking')
     cv2.setMouseCallback('tracking', draw_boundingbox)
-
-    while(cap.isOpened()):
-        ret, frame = cap.read()
+    ret, frame = vc.read()
+    cv2.imshow('tracking',frame)
+    cv2.waitKey()
+    videoWriter=cv2.VideoWriter('./result/result.mp4',cv2.VideoWriter_fourcc(*'XVID'),30,(1280,720))
+    while(vc.isOpened()):
+        ret, frame = vc.read()
         if not ret:
             break
 
@@ -92,9 +96,11 @@ if __name__ == '__main__':
             cv2.putText(frame, 'FPS: ' + str(1 / duration)[:4].strip('.'), (8, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
         cv2.imshow('tracking', frame)
+        videoWriter.write(frame)
         c = cv2.waitKey(inteval) & 0xFF
         if c == 27 or c == ord('q'):
             break
+    videoWriter.release()
 
     cap.release()
     cv2.destroyAllWindows()
